@@ -1,0 +1,674 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Classes</title>
+<link id="tabIcon" rel="icon" href="https://ssl.gstatic.com">
+<style>
+/* Using !important to force the color to show up */
+
+/* Clean Blue Highlight - No Red Borders */
+#suggestions li.nav-active {
+    background-color: #4285f4 !important; /* Google Blue */
+    color: #ffffff !important;           /* White Text */
+    border: none !important;             /* Removes the red box border */
+    outline: none !important;            /* Removes the red box outline */
+    border-radius: 4px;                  /* Optional: smooth corners */
+}
+
+/* Ensure all text inside the highlighted row turns white */
+#suggestions li.nav-active * {
+    color: #ffffff !important;
+}
+
+
+/* Force the text inside to be white as well */
+#suggestions li.nav-active .stext {
+    color: white !important;
+}
+
+  
+
+/* Delete Mode Jiggle Animation */
+@keyframes jiggle {
+    0% { transform: rotate(-1deg); }
+    50% { transform: rotate(1.5deg); }
+    100% { transform: rotate(-1deg); }
+}
+
+.delete-mode-active .icon {
+    animation: jiggle 0.2s infinite;
+    border: 2px solid #ef4444 !important;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org" width="20" height="20" style="font-size: 20px;"><text y="15">🗑️</text></svg>'), auto !important;
+}
+
+/* Red trash icon for the menu item */
+.menu-delete-btn { color: #ef4444; font-weight: bold; }
+.delete-mode-on { background: #fee2e2 !important; }
+
+/* --- TAB KEY HIGHLIGHT --- */
+/* This class is added by JS when you use the keyboard */
+.nav-active {
+    background: #2563eb !important;  /* Bright Blue */
+    color: #ffffff !important;       /* White Text */
+    font-weight: bold;
+    padding-left: 20px;              /* Slide text to the right */
+}
+
+/* Dark mode adjustment */
+body.dark-mode .nav-active {
+    background: #60a5fa !important;
+    color: #0f172a !important;
+}
+
+:root { --glass: rgba(255, 255, 255, 0.2); --glass-heavy: rgba(255, 255, 255, 0.4); --blur: blur(15px); }
+body { margin: 0; padding: 40px; font-family: 'Segoe UI', sans-serif; background: #cbd5e1; background-size: cover; background-position: center; background-attachment: fixed; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.5s ease; }
+.search-wrapper { width: 100%; max-width: 600px; margin-bottom: 40px; position: relative; }
+.search-bar { width: 100%; padding: 15px 25px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3); background: var(--glass-heavy); backdrop-filter: var(--blur); font-size: 18px; outline: none; color: #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.1); box-sizing: border-box; }
+#suggestions { position: absolute; top: 110%; left: 10px; right: 10px; background: white; border-radius: 20px; list-style: none; padding: 10px 0; margin: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; z-index: 1000; overflow: hidden; }
+#suggestions li { padding: 12px 25px; cursor: pointer; font-size: 16px; color: #334155; display: flex; align-items: center; }
+#suggestions li:hover { background: #f1f5f9; color: #2563eb; }
+.clock-container { text-align: center; margin-bottom: 30px; padding: 20px 40px; background: var(--glass-heavy); backdrop-filter: var(--blur); border-radius: 25px; color: #1e293b; border: 1px solid rgba(255,255,255,0.3); }
+#clock { font-size: 4rem; font-weight: 800; margin: 0; letter-spacing: -2px; }
+.wrapper { width: 100%; max-width: 900px; padding: 45px; border-radius: 35px; background: var(--glass); backdrop-filter: var(--blur); border: 1px solid rgba(255,255,255,0.2); }
+.grid { display: flex; gap: 35px; flex-wrap: wrap; justify-content: center; }
+.icon-box { text-align: center; width: 110px; }
+.icon { width: 100px; height: 100px; background: white; border-radius: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.12); cursor: pointer; transition: 0.3s; margin: 0 auto; overflow: hidden; }
+.icon:hover { transform: scale(1.1); }
+.icon img { width: 55px; height: 55px; object-fit: contain; }
+.icon span { font-size: 65px; line-height: 1; display: block; } /* Big Notes Icon */
+.label { margin-top: 12px; font-weight: 600; font-size: 14px; color: #1e293b; }
+.settings { position: fixed; top: 20px; right: 20px; width: 38px; height: 38px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; }
+.menu { position: fixed; top: 70px; right: 20px; background: white; border-radius: 15px; display: none; padding: 10px; width: 220px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.menu div { padding: 12px; cursor: pointer; border-radius: 10px; font-size: 14px; font-weight: 500; }
+.menu div:hover { background: #f1f5f9; color: #2563eb; }
+.notes-overlay { position: fixed; inset:0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; }
+.notes-window { width: 90%; max-width: 650px; height: 450px; background: white; border-radius: 25px; display: flex; flex-direction: column; }
+textarea { width: 100%; height: 100%; border: none; resize: none; padding: 20px; outline: none; font-family: inherit; }
+/* --- DARK MODE STYLES --- */
+body.dark-mode {
+    background-color: #0f172a; /* Dark Navy Background */
+    --glass: rgba(0, 0, 0, 0.5);       /* Dark Glass */
+    --glass-heavy: rgba(0, 0, 0, 0.7); /* Darker Glass */
+}
+
+/* Fix Text Colors in Dark Mode */
+body.dark-mode .label, 
+body.dark-mode .search-bar, 
+body.dark-mode .clock-container,
+body.dark-mode #suggestions li {
+    color: #f1f5f9; /* White text */
+}
+
+/* Fix Dropdown Menus in Dark Mode */
+body.dark-mode .menu, 
+body.dark-mode #suggestions {
+    background: #1e293b;
+    color: white;
+}
+body.dark-mode .menu div:hover,
+body.dark-mode #suggestions li:hover {
+    background: #334155; /* Darker hover state */
+    color: #60a5fa;
+}
+
+/* Fix Icon Boxes */
+body.dark-mode .icon {
+    background: #1e293b;
+}
+body.dark-mode .icon span {
+    filter: grayscale(1) brightness(2); /* Make emojis pop on dark */
+/* --- EXCEPTION: Keep Notes App White --- */
+body.dark-mode #notes {
+    background: white !important;   /* Force white background */
+}
+
+body.dark-mode #notes span {
+    filter: none !important;        /* Remove the gray filter so emoji stays yellow */
+}
+
+
+</style>
+</head>
+<body>
+<div class="settings" onclick="toggleMenu(event)">⚙️</div>
+<div class="menu" id="menu">
+  <div onclick="addGoogleApp()">➕ Add Google App</div>
+  <div onclick="addCustomApp()">🔗 Add Custom App</div>
+  <div onclick="tabCloaker()">🎭 Tab Cloaker</div>
+  <div onclick="document.getElementById('bgPicker').click()">🖼️ Change Background</div>
+  <div onclick="toggleDeleteMode(this)" class="menu-delete-btn">🗑️ Toggle Delete Mode</div>
+  <div onclick="configurePanicKey()">🚨 Configure Panic Key</div>
+  <div onclick="toggleTheme()">🌓 Toggle Dark Mode</div>
+  <div onclick="setPassword()">🔒 Set Settings Password</div>
+  <div onclick="exportSave()">💾 Save Code</div>
+  <div onclick="importSave()">📥 Import Code</div>
+  <div onclick="factoryReset()" style="color: #ef4444; border-top: 1px solid #eee; margin-top: 5px;">⚠️ Factory Reset</div>
+</div>
+
+<div class="clock-container"><div id="clock">00:00:00 AM</div><div id="date">Loading...</div></div>
+
+<div class="search-wrapper">
+  <input type="text" class="search-bar" id="searchInput" autofocus placeholder="Search Google..." autocomplete="off">
+<ul id="suggestions"></ul>
+
+
+
+</div>
+
+<div class="wrapper"><div class="grid" id="grid"></div></div>
+
+<div class="notes-overlay" id="notes"><div class="notes-window"><div style="padding:20px; font-weight:bold;">Quick Notes <span style="float:right;cursor:pointer" onclick="closeNotes()">✕</span></div><textarea id="noteBox"></textarea></div></div>
+
+<input type="file" id="bgPicker" style="display:none" accept="image/*" onchange="localBackground(this)">
+
+<script>
+ 
+const HISTORY_KEY = "search_history_v1";
+const SAVE_KEY = "dashboard_final_v1";
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    state.darkMode = document.body.classList.contains('dark-mode');
+    save();
+}
+
+
+const googleAppsList = [
+  {id: "notes", name: "Notes", url: "#", icon: "📝"},
+  {id: "youtube", name: "YouTube", url: "https://www.youtube.com", icon: "https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg"},
+  {id: "gmail", name: "Gmail", url: "https://mail.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"},
+  {id: "calendar", name: "Calendar", url: "https://calendar.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"},
+  {id: "classroom", name: "Classroom", url: "https://classroom.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png"},
+  {id: "drive", name: "Drive", url: "https://drive.google.com", icon: "https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png"},
+  {id: "photos", name: "Photos", url: "https://photos.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/5/50/Google_Photos_icon_%282020-2025%29.svg"},
+  {id: "docs", name: "Docs", url: "https://docs.google.com", icon: "https://www.gstatic.com/images/branding/product/1x/docs_2020q4_48dp.png"},
+  {id: "slides", name: "Slides", url: "https://slides.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Google_Slides_logo_%282014-2020%29.svg"},
+  {id: "sheets", name: "Sheets", url: "https://sheets.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/3/30/Google_Sheets_logo_%282014-2020%29.svg"},
+  {id: "forms", name: "Forms", url: "https://forms.google.com", icon: "https://upload.wikimedia.org"},
+  {id: "meet", name: "Meet", url: "https://meet.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Google_Meet_icon_%282020%29.svg"},
+  {id: "keep", name: "Keep", url: "https://keep.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Google_Keep_2020_Logo.svg"},
+];
+let state = { apps: [], background: null, cloak: {title: "Classes", icon: "https://ssl.gstatic.com"}, panic: {key: "`", url: "https://classroom.google.com"}, pass: null, notes: "" };
+
+function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+
+function getResetApps() {
+    return [
+      {id: "notes", name: "Notes", url: "#", emoji: "📝"},
+      {id: "youtube", name: "YouTube", url: "https://www.youtube.com", icon: "https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg"},
+      {id: "gmail", name: "Gmail", url: "https://mail.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg"},
+      {id: "calendar", name: "Calendar", url: "https://calendar.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"}
+    ];
+}
+
+function load() {
+    const s = localStorage.getItem(SAVE_KEY);
+    if (s) {
+        state = JSON.parse(s);
+    } else {
+        state.apps = getResetApps();
+        save();
+    }
+
+    // --- RESTORE DARK MODE ---
+    // This checks if you saved it as "true" last time
+    if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+    }
+
+    applyBackground();
+    applyCloak();
+    render();
+    updateClock();
+    document.getElementById('noteBox').value = state.notes || "";
+}
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    const suggestions = document.getElementById('suggestions');
+    const items = suggestions.getElementsByTagName('li');
+    
+    // --- 1. TAB CYCLING ---
+    if (e.key === 'Tab') {
+        if (suggestions.style.display !== 'none' && items.length > 0) {
+            e.preventDefault(); 
+            e.stopImmediatePropagation();
+
+            let currentIndex = -1;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].classList.contains('nav-active')) {
+                    currentIndex = i;
+                    items[i].classList.remove('nav-active');
+                    break;
+                }
+            }
+
+            let nextIndex = (currentIndex + 1) % items.length;
+            items[nextIndex].classList.add('nav-active');
+            
+            // OPTIONAL: Update the search bar text as you tab
+            this.value = items[nextIndex].innerText;
+        }
+    }
+
+    // --- 2. ENTER TO SEARCH ---
+    else if (e.key === 'Enter') {
+        let selectedText = this.value; // Default to what is typed
+        
+        // Check if one of the suggestions is highlighted
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].classList.contains('nav-active')) {
+                selectedText = items[i].innerText;
+                break;
+            }
+        }
+
+        if (selectedText.trim() !== "") {
+            window.location.href = "https://www.google.com" + encodeURIComponent(selectedText);
+        }
+    }
+}, true);
+
+let currentFocus = -1; // Keeps track of which item is highlighted
+
+function handleSearch(q) {
+    if (!q) return;
+    const urlPattern = /^(https?:\/\/)?([\w\d-]+\.)+\w{2,}(\/.*)?$/i;
+    if (urlPattern.test(q)) {
+        window.location.href = q.startsWith('http') ? q : `https://${q}`;
+    } else {
+        let hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        // Save to history (prevent duplicates)
+        localStorage.setItem(HISTORY_KEY, JSON.stringify([q, ...hist.filter(h => h !== q)].slice(0, 10)));
+        window.location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+    }
+}
+
+
+// 3. Close when clicking away
+document.addEventListener('click', function(e) {
+    if (e.target.id !== 'searchInput') {
+        ul.style.display = 'none';
+    }
+});
+
+window.renderResults = function(data) {
+    const val = document.getElementById('searchInput').value.toLowerCase();
+    const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]")
+        .filter(h => h.toLowerCase().includes(val))
+        .slice(0, 3);
+        
+    // Combine History + Google Results
+    const combined = [
+        ...hist.map(h => ({t: h, i: ''})), 
+        ...data[1].map(d => ({t: d, i: ''}))
+    ];
+
+    const ul = document.getElementById('suggestions');
+    ul.innerHTML = "";
+
+    // Render the list
+    // Locate this section in your script
+combined.slice(0, 8).forEach(item => {
+    const li = document.createElement('li');
+    // This line is the "ID tag" for the suggestion
+    li.setAttribute("data-val", item.t); 
+    li.innerHTML = `<span class="sicon">${item.i}</span><span class="stext">${item.t}</span>`;
+    li.onclick = () => {
+        handleSearch(item.t);
+    };
+    ul.appendChild(li);
+});
+
+
+    ul.style.display = combined.length ? 'block' : 'none';
+};
+
+// LISTENERS (Paste these at the very end)
+
+// 1. Trigger Google Search on type
+document.getElementById('searchInput').addEventListener('input', function() {
+    const val = this.value.trim();
+    if (!val) {
+        document.getElementById('suggestions').style.display = 'none';
+        return;
+    }
+    const script = document.createElement('script');
+    script.src = "https://suggestqueries.google.com/complete/search?client=firefox&callback=renderResults&q=" + encodeURIComponent(val);
+    document.body.appendChild(script);
+    script.remove();
+});
+
+// 2. Close menu when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.id !== 'searchInput') {
+        document.getElementById('suggestions').style.display = 'none';
+    }
+});
+
+// 3. Enter key support
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleSearch(this.value);
+});
+function addGoogleApp() {
+  let list = googleAppsList.map((a, i) => `${i+1}. ${a.name}`).join('\n');
+  let choice = prompt(`Enter app number to add:\n\n${list}`);
+  if (choice && googleAppsList[choice-1]) { state.apps.push(googleAppsList[choice-1]); render(); save(); }
+}
+
+function deleteApp(index) {
+    if(confirm(`Are you sure you want to delete ${state.apps[index].name}?`)) {
+        state.apps.splice(index, 1);
+        render();
+        save();
+    }
+}
+
+function tabCloaker() {
+  let list = googleAppsList.filter(a => a.icon).map((a, i) => `${i+1}. ${a.name}`).join('\n');
+  let name = prompt("New Tab Title:", state.cloak.title);
+  let iconChoice = prompt(`Pick icon number:\n\n${list}\n\n(Leave blank for custom URL)`);
+  if (name) state.cloak.title = name;
+  const iconApps = googleAppsList.filter(a => a.icon);
+  if (iconChoice && iconApps[iconChoice-1]) { state.cloak.icon = iconApps[iconChoice-1].icon; } 
+  else { let custom = prompt("Custom Icon URL:"); if (custom) state.cloak.icon = custom; }
+  applyCloak(); save();
+}
+
+function localBackground(input) {
+  if (input.files && input.files[0]) {
+    let reader = new FileReader();
+    reader.onload = e => { state.background = e.target.result; applyBackground(); save(); };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function exportSave() {
+    const text = JSON.stringify(state);
+
+    const box = document.createElement("textarea");
+    box.value = text;
+    document.body.appendChild(box);
+    box.select();
+    document.execCommand("copy");
+    document.body.removeChild(box);
+
+    alert("Save code copied to clipboard!");
+}
+function importSave() {
+    const s = prompt("Paste Save Code:");
+    if (!s) return;
+
+    try {
+        const parsed = JSON.parse(s);
+
+        // Prevent broken saves
+        if (!parsed.apps) throw "Invalid Save";
+
+        state = parsed;
+        save();
+        location.reload();
+
+    } catch (err) {
+        alert("Invalid save code.");
+        console.error(err);
+    }
+}
+function factoryReset() { 
+  if(confirm("Reset everything?")) { 
+    localStorage.clear(); 
+    state = { apps: getResetApps(), background: null, cloak: {title: "Classes", icon: "https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png"}, panic: {key: "`", url: "https://classroom.google.com"}, pass: null, notes: "" };
+    save();
+    location.reload(); 
+  } 
+}
+
+function applyBackground() { if(state.background) document.body.style.backgroundImage = `url(${state.background})`; }
+function applyCloak() { document.title = state.cloak.title; document.getElementById("tabIcon").href = state.cloak.icon; }
+function updateClock() {
+  const n = new Date(); document.getElementById('clock').textContent = n.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+  document.getElementById('date').textContent = n.toLocaleDateString([], {weekday:'long', month:'long', day:'numeric'}); setTimeout(updateClock, 1000);
+}
+function render() {
+  const g = document.getElementById("grid"); 
+  g.innerHTML = "";
+  
+  state.apps.forEach((app, index) => {
+    const b = document.createElement("div"); 
+    b.className = "icon-box";
+    b.oncontextmenu = (e) => { e.preventDefault(); deleteApp(index); };
+    
+    if (app.id === 'notes') {
+        // Notes still needs an onclick because it's a popup, not a website
+        b.innerHTML = `
+          <div class="icon" onclick="openNotes()"><span>📝</span></div>
+          <div class="label">Notes</div>
+        `;
+    } else {
+        // Everything else uses a REAL link with target="_blank"
+        b.innerHTML = `
+          <a href="${app.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+            <div class="icon">
+              ${app.emoji ? `<span>${app.emoji}</span>` : `<img src="${app.icon}">`}
+            </div>
+            <div class="label">${app.name}</div>
+          </a>
+        `;
+    }
+    g.appendChild(b);
+  });
+}
+
+function toggleMenu(e) { e.stopPropagation(); const m = document.getElementById("menu"); if(state.pass && m.style.display !== "block") { if(prompt("Pass:") !== state.pass) return; } m.style.display = m.style.display === "block" ? "none" : "block"; }
+function openNotes() { document.getElementById("notes").style.display = "flex"; }
+function closeNotes() { state.notes = document.getElementById("noteBox").value; save(); document.getElementById("notes").style.display = "none"; }
+function addCustomApp() { let n = prompt("Name:"), u = prompt("URL:"), i = prompt("Icon URL:"); if(n && u) { state.apps.push({name:n, url:u, icon:i}); render(); save(); } }
+function configurePanicKey() { let k = prompt("Key:", state.panic.key), u = prompt("URL:", state.panic.url); if(k) state.panic.key = k.toLowerCase(); if(u) state.panic.url = u; save(); }
+function setPassword() { state.pass = prompt("New password (blank to remove):") || null; save(); }
+document.addEventListener('keydown', e => { if(e.key.toLowerCase() === state.panic.key) window.location.href = state.panic.url; });
+document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') handleSearch(e.target.value); });
+document.addEventListener('click', () => document.getElementById("menu").style.display = "none");
+load();
+let isDeleteMode = false;
+
+function toggleDeleteMode(menuItem) {
+    isDeleteMode = !isDeleteMode;
+    
+    // Toggle visual state in the menu and on the body
+    menuItem.classList.toggle('delete-mode-on');
+    document.body.classList.toggle('delete-mode-active');
+
+    // Close menu after clicking
+    document.getElementById('menu').style.display = 'none';
+}
+
+// Add a "Capture" event listener to intercept clicks before they open the app
+document.getElementById('grid').addEventListener('click', function(e) {
+    if (!isDeleteMode) return;
+
+    const iconBox = e.target.closest('.icon-box');
+    if (iconBox) {
+        // Prevent the app from opening
+        e.preventDefault();
+        e.stopPropagation();
+
+        const appName = iconBox.querySelector('.label').innerText;
+        const confirmDelete = confirm(`Are you sure you want to delete ${appName}?`);
+        
+        if (confirmDelete) {
+            // Remove from DOM
+            iconBox.remove();
+            
+            // Logic to remove from your 'state' object
+            const index = state.apps.findIndex(a => a.name === appName);
+            if (index > -1) {
+                state.apps.splice(index, 1);
+                save(); // Call your existing save function
+            }
+        }
+    }
+}, true); // The 'true' makes it intercept clicks first
+
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        const suggestions = document.getElementById('suggestions');
+        const items = suggestions.querySelectorAll('li');
+        
+        if (suggestions.style.display === 'block' && items.length > 0) {
+            // 1. Stop the browser from jumping focus or clearing text
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            // 2. Find current highlight
+            let currentIndex = Array.from(items).findIndex(li => li.classList.contains('nav-active'));
+
+            // 3. Clear existing highlight
+            if (currentIndex !== -1) {
+                items[currentIndex].classList.remove('nav-active');
+            }
+
+            // Replace your Tab listener block with this:
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        const suggestions = document.getElementById('suggestions');
+        const items = suggestions.querySelectorAll('li');
+        
+        if (suggestions.style.display === 'block' && items.length > 0) {
+            e.preventDefault(); 
+            e.stopImmediatePropagation();
+
+            let currentIndex = Array.from(items).findIndex(li => li.classList.contains('nav-active'));
+            if (currentIndex !== -1) {
+                items[currentIndex].classList.remove('nav-active');
+            }
+
+            let nextIndex = (currentIndex + 1) % items.length;
+            items[nextIndex].classList.add('nav-active');
+
+            // NOTICE: The "this.value = ..." line is gone.
+            // Your typed text will now stay in the search bar.
+        }
+    }
+}, true);
+
+        }
+    }
+}, true); // The "true" ensures we catch the event before other scriptsss
+window.onload = () => {
+    setTimeout(() => {
+        document.getElementById('searchInput').focus();
+    }, 100); // 100ms delay is usually enough to bypass Chrome's default focus
+};
+function focusSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.focus();
+    }
+}
+
+// 1. Try as soon as the window loads
+window.onload = focusSearch;
+
+// 2. Try again after 100ms to "steal" focus back from the Chrome address bar
+setTimeout(focusSearch, 100);
+// Force focus on the search bar when the page loads
+window.addEventListener('load', () => {
+    const searchInput = document.getElementById('searchInput');
+    
+    // Attempt focus immediately
+    searchInput.focus();
+    
+    // Attempt focus again after a 100ms delay to "steal" it back from the browser
+    setTimeout(() => {
+        searchInput.focus();
+    }, 100);
+});
+// Force the cursor into the search bar, bypassing Chrome's address bar lock
+function forceSearchFocus() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.focus();
+        // Use 'select' to ensure the cursor is active and ready
+        searchInput.select(); 
+    }
+}
+
+// Trigger 1: Try immediately when the window loads
+window.addEventListener('load', forceSearchFocus);
+
+// Trigger 2: Try again after 150ms to "steal" focus back if Chrome grabbed it
+setTimeout(forceSearchFocus, 150);
+
+// Trigger 3: Optional 'Safety' focus if you click anywhere on the background
+document.body.addEventListener('click', (e) => {
+    if (e.target === document.body) forceSearchFocus();
+});
+function stealFocus() {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.focus();
+        // This ensures the cursor is actually active and blinking
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+}
+
+// 1. Try when the window is fully loaded
+window.onload = stealFocus;
+
+// 2. Chrome often locks the omnibar 50-100ms after load. 
+// We wait 150ms to grab it back.
+setTimeout(stealFocus, 150);
+function forceFocus() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && document.activeElement !== searchInput) {
+        searchInput.focus();
+        searchInput.select();
+    }
+}
+
+// Poll for focus every 50ms for the first 500ms
+// This ensures we catch the exact moment Chrome releases its lock
+let focusAttempts = 0;
+const focusInterval = setInterval(() => {
+    forceFocus();
+    focusAttempts++;
+    if (focusAttempts > 10) clearInterval(focusInterval);
+}, 50);
+
+// Also try once more when everything is completely finished loading
+window.addEventListener('load', forceFocus);
+function grabFocus() {
+    const input = document.getElementById('searchInput');
+    if (input && document.activeElement !== input) {
+        input.focus();
+        input.select();
+    }
+}
+
+let attempts = 0;
+const focusTimer = setInterval(() => {
+    grabFocus();
+    attempts++;
+    if (attempts > 50 || document.activeElement === document.getElementById('searchInput')) {
+        clearInterval(focusTimer);
+    }
+}, 10);
+
+window.onload = function() {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.focus();
+        // Optional: puts the cursor at the end if there's already text
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+};
+
+
+
+
+</script>
+</body>
+</html>
